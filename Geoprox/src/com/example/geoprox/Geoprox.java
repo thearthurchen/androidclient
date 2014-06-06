@@ -10,40 +10,129 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 public class Geoprox extends Activity {
 
+	int [] buttoncolor;
+	int colorblue;
+	int colorgrey;
+	int score;
+	Button [] popButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_geoprox);
+		popButton = new Button[12];
+		String buttonstring = "";
+		buttoncolor = new int[12];
+		colorblue = Color.argb(255, 50, 200, 255);
+		colorgrey = Color.argb(255, 100, 100, 100);
+		score = 0;
+		TextView mTextField = (TextView) findViewById(R.id.score);
+		mTextField.setText("Score: " + score);
 		
+		for (int i=0; i<12; i++)
+		{
+			buttoncolor[i] = 0;
+			buttonstring = "button" + Integer.toString(i+1);
+			int resID = getResources().getIdentifier(buttonstring, "id", "com.example.geoprox");
+			popButton[i] = (Button) findViewById(resID);
+			popButton[i].setBackgroundColor(colorgrey);
+			popButton[i].setTag(R.id.string_key, 0);
+			popButton[i].setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View buttonview) {
+					int toggle = (Integer) buttonview.getTag(R.id.string_key);
+					if (toggle == 0)
+					{
+						//buttonview.setBackgroundColor(colorblue);
+						//buttonview.setTag(R.id.string_key,1);
+						Log.v("HI","YOUFAIL");
+						score--;
+						TextView mTextField = (TextView) findViewById(R.id.score);
+						mTextField.setText("Score: " + score);
+					}
+					else
+					{
+						turnOn();
+						buttonview.setBackgroundColor(colorgrey);
+						buttonview.setTag(R.id.string_key,0);
+						
+						score++;
+						TextView mTextField = (TextView) findViewById(R.id.score);
+						mTextField.setText("Score: " + score);
+						Log.v("HI",Integer.toString(score));
+					}
+				}
+			});
+		}
 		
-		EditText urlText = (EditText) findViewById(R.id.URL1);
-		Button popButton = (Button) findViewById(R.id.get_button);
-		urlText.setText("http://geo-prox.herokuapp.com/api/locate?lon=35&lat=40", TextView.BufferType.EDITABLE);
-		popButton.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View arg0) {
-				//HTTP URL declared here
-				EditText urlText = (EditText) findViewById(R.id.URL1);
-				String url = urlText.getText().toString();
-				HttpAsyncTask httprun = new HttpAsyncTask();
-			    httprun.execute(url);
-			}
-		});
+		//Generate initial 3 blocks
+		int i = 0;
+		while (i < 3)
+		{
+			turnOn();
+			i++;
+		}
+		
+		new CountDownTimer(10000, 10) {
+			 TextView mTextField = (TextView) findViewById(R.id.timer);
+		     public void onTick(long millisUntilFinished) {
+		         mTextField.setText("Time Left: " + millisUntilFinished / 1000.0);
+		     }
+
+		     public void onFinish() {
+		         mTextField.setText("TIMES UP!");
+		         for (int i=0; i<12; i++)
+		 		{
+		        	String buttonstring = "";
+		 			buttoncolor[i] = 0;
+		 			buttonstring = "button" + Integer.toString(i+1);
+		 			int resID = getResources().getIdentifier(buttonstring, "id", "com.example.geoprox");
+		 			popButton[i] = (Button) findViewById(resID);
+		 			popButton[i].setBackgroundColor(colorgrey);
+		 			popButton[i].setTag(R.id.string_key, 0);
+		 			popButton[i].setOnClickListener(null);
+		 		}
+		         
+		         
+		     }
+		  }.start();
+
 		
 	}
-
+	
+	public void turnOn()
+	{
+		int i = 0;
+		int randomnum = 0;
+		while(i == 0)
+		{
+			randomnum = (int) (Math.random() * 12);
+			Log.v("number",Integer.toString(randomnum));
+			int toggle = (Integer) popButton[randomnum].getTag(R.id.string_key);
+			if (toggle == 1)
+				continue;
+			else
+				break;
+		}
+		popButton[randomnum].setBackgroundColor(colorblue);
+		popButton[randomnum].setTag(R.id.string_key,1);
+		
+	}
 	/*
 	 * Simple HTTP GET routine
 	 * Takes HTTP URL and returns GET response in String
