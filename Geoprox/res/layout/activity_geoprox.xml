@@ -15,4 +15,14 @@
      android:layout_width="fill_parent"
      android:text="HTTP GET"
      android:clickable="true" />
+
+	<EditText
+	    android:id="@+id/URL1"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:ems="10" >
+
+	    <requestFocus />
+	</EditText>
+
 </LinearLayout>

@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class Geoprox extends Activity {
@@ -26,12 +28,15 @@ public class Geoprox extends Activity {
 		setContentView(R.layout.activity_geoprox);
 		
 		
+		EditText urlText = (EditText) findViewById(R.id.URL1);
 		Button popButton = (Button) findViewById(R.id.get_button);
+		urlText.setText("http://geo-prox.herokuapp.com/api/locate?lon=35&lat=40", TextView.BufferType.EDITABLE);
 		popButton.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
 				//HTTP URL declared here
-				String url = "http://geo-prox.herokuapp.com/api/locate?lon=35&lat=40";
+				EditText urlText = (EditText) findViewById(R.id.URL1);
+				String url = urlText.getText().toString();
 				HttpAsyncTask httprun = new HttpAsyncTask();
 			    httprun.execute(url);
 			}
