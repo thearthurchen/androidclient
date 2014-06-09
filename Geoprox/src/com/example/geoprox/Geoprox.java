@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 public class Geoprox extends Activity {
 
+	static final int RESTART_GAME = 1;
 	int [] buttoncolor;
 	int colorblue;
 	int colorgrey;
@@ -35,6 +37,11 @@ public class Geoprox extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_geoprox);
+		startGame();
+	}
+	
+	private void startGame()
+	{
 		popButton = new Button[12];
 		String buttonstring = "";
 		buttoncolor = new int[12];
@@ -88,6 +95,7 @@ public class Geoprox extends Activity {
 			i++;
 		}
 		
+		//Countdown timer
 		new CountDownTimer(10000, 10) {
 			 TextView mTextField = (TextView) findViewById(R.id.timer);
 		     public void onTick(long millisUntilFinished) {
@@ -107,12 +115,31 @@ public class Geoprox extends Activity {
 		 			popButton[i].setTag(R.id.string_key, 0);
 		 			popButton[i].setOnClickListener(null);
 		 		}
-		         
+		        scoreScreen();
+		        
 		         
 		     }
 		  }.start();
-
-		
+	}
+	
+	public void scoreScreen(){
+		 Intent mIntent = new Intent(this, FinalScore.class);
+         mIntent.putExtra("Score", Integer.toString(score));
+         startActivityForResult(mIntent, RESTART_GAME);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    // Check which request we're responding to
+	    if (resultCode == RESULT_OK) {
+	        // Make sure the request was successful
+	    	Log.v("HI","RESTARTGMAE");
+	        startGame();
+	    }
+	    else
+	    {
+	    	Log.v("HI","fail");
+	    }
 	}
 	
 	public void turnOn()

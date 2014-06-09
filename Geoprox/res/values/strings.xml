@@ -4,6 +4,9 @@
     <string name="app_name">Geoprox</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <item type="id"
-        name="string_key" />
+
+    <item name="string_key" type="id"/>
+
+    <string name="title_activity_final_score">FinalScore</string>
+
 </resources>
