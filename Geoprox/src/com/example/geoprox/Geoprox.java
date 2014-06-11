@@ -3,11 +3,19 @@ package com.example.geoprox;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,6 +31,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koushikdutta.async.future.Future;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.socketio.Acknowledge;
+import com.koushikdutta.async.http.socketio.ConnectCallback;
+import com.koushikdutta.async.http.socketio.EventCallback;
+import com.koushikdutta.async.http.socketio.JSONCallback;
+import com.koushikdutta.async.http.socketio.SocketIOClient;
+import com.koushikdutta.async.http.socketio.StringCallback;
 
 
 public class Geoprox extends Activity {
@@ -33,13 +49,109 @@ public class Geoprox extends Activity {
 	int colorgrey;
 	int score;
 	Button [] popButton;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_geoprox);
+		socketConnect();
 		startGame();
 	}
 	
+	/*
+	 * Attempts to connect to server socket
+	 * TODO: change the hardcoded URL
+	 */
+	private void socketConnect(){
+		socketCallback mysocket = new socketCallback();
+		Future<SocketIOClient> futureSocket = SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://geo-prox.herokuapp.com",  mysocket);
+		SocketIOClient newSocket = null;
+		try {
+			 newSocket = futureSocket.get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONArray JSONargs = createJSONArray("hello","world");
+        newSocket.emit("echo",JSONargs);
+        Log.v("HI","second");
+        
+        newSocket.on("hello", new EventCallback() {
+            @Override
+            public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
+            	JSONObject socketmsg = null;
+            	try {
+					 socketmsg = arguments.getJSONObject(0);
+					 Iterator<String> iter = socketmsg.keys();
+					    while(iter.hasNext()){
+					        String key = (String)iter.next();
+					        String value = socketmsg.getString(key);
+					        Log.v("HI","key: " + key);
+			            	Log.v("HI","value: " + value);
+					    }
+					    
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
+            }
+        });
+	}
+	
+	/*
+	 * Socket call back function, identical to example given
+	 * moved emit and on outside of class
+	 */
+	class socketCallback implements ConnectCallback{
+		@Override
+	    public void onConnectCompleted(Exception ex, SocketIOClient client) {
+	    	if (ex != null) {
+	            ex.printStackTrace();
+	            return;
+	        }
+	        client.setStringCallback(new StringCallback() {
+				@Override
+				public void onString(String string, Acknowledge acknowledge) {
+					// TODO Auto-generated method stub
+					
+				}
+	        });
+	        client.setJSONCallback(new JSONCallback() {
+				@Override
+				public void onJSON(JSONObject json, Acknowledge acknowledge) {
+					// TODO Auto-generated method stub
+					
+				}
+	        });
+	        
+	    }
+	}
+	//http://geo-prox.herokuapp.com:
+	//http://sheltered-coast-2820.herokuapp.com:5000
+	/*
+	 * Creat a JSONArray with one pair given a key string and value string
+	 */
+	private JSONArray createJSONArray(String key, String value){
+		JSONObject jo = new JSONObject();
+    	try {
+			jo.put(key, value);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	JSONArray ja = new JSONArray();
+    	ja.put(jo);
+    	return ja;
+	}
+
+	
+	/*
+	 * Initialize and begin the countdown for the actual game
+	 */
 	private void startGame()
 	{
 		popButton = new Button[12];
