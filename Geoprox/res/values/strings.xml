@@ -8,5 +8,6 @@
     <item name="string_key" type="id"/>
 
     <string name="title_activity_final_score">FinalScore</string>
+    <string name="title_activity_main_menu">MainMenu</string>
 
 </resources>

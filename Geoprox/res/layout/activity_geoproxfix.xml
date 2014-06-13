@@ -10,32 +10,32 @@
     tools:context=".Geoprox" >
 
      <LinearLayout 
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
      	android:layout_width="fill_parent"
         android:orientation="vertical"
-        android:layout_weight = "1.1"
+        android:layout_weight = "1"
         >
         
         <TextView
-        android:id="@+id/timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="timer"
-        />
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="timer" />
+
         <TextView
         android:id="@+id/score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:gravity="left"
+        android:layout_gravity="right"
+        android:gravity="right"
         android:text="clientscore"
         />
          <TextView
         android:id="@+id/scoreclone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:gravity="left"
+        android:layout_gravity="right"
+        android:gravity="right"
         android:text="serverscore"
         />
 
@@ -43,7 +43,7 @@
             
         </LinearLayout>
     <LinearLayout 
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
      	android:layout_width="fill_parent"
         android:orientation="horizontal"
         android:layout_weight = "1"
@@ -80,7 +80,7 @@
         
     </LinearLayout>
 	<LinearLayout 
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
      	android:layout_width="fill_parent"
         android:orientation="horizontal"
         android:layout_weight = "1"
@@ -115,7 +115,7 @@
         
     </LinearLayout>
     <LinearLayout 
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
      	android:layout_width="fill_parent"
         android:orientation="horizontal"
         android:layout_weight = "1"
@@ -150,7 +150,7 @@
         
     </LinearLayout>
     <LinearLayout 
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
      	android:layout_width="fill_parent"
         android:orientation="horizontal"
         android:layout_weight = "1"

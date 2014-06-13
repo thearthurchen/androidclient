@@ -54,15 +54,16 @@ public class Geoprox extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_geoprox);
-		socketConnect();
-		startGame();
+		SocketIOClient mysocket = null;
+		mysocket = socketConnect();
+		startGame(mysocket);
 	}
 	
 	/*
 	 * Attempts to connect to server socket
 	 * TODO: change the hardcoded URL
 	 */
-	private void socketConnect(){
+	private SocketIOClient socketConnect(){
 		socketCallback mysocket = new socketCallback();
 		Future<SocketIOClient> futureSocket = SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://geo-prox.herokuapp.com",  mysocket);
 		SocketIOClient newSocket = null;
@@ -75,28 +76,34 @@ public class Geoprox extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONArray JSONargs = createJSONArray("hello","world");
-        newSocket.emit("echo",JSONargs);
+		//JSONArray JSONargs = createJSONArray("hello","world");
+        //newSocket.emit("echo",JSONargs);
         Log.v("HI","second");
-        
-        newSocket.on("hello", new EventCallback() {
+        onSocket(newSocket);
+        return newSocket;
+	}
+	
+	private void onSocket(SocketIOClient newSocket){
+		newSocket.on("scoreserver", new EventCallback() {
             @Override
             public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
             	JSONObject socketmsg = null;
+            	String key = null;
+            	String value = null;
             	try {
 					 socketmsg = arguments.getJSONObject(0);
 					 Iterator<String> iter = socketmsg.keys();
 					    while(iter.hasNext()){
-					        String key = (String)iter.next();
-					        String value = socketmsg.getString(key);
-					        Log.v("HI","key: " + key);
-			            	Log.v("HI","value: " + value);
+					        key = (String)iter.next();
+					        value = socketmsg.getString(key);
 					    }
-					    
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+            	TextView mTextField = (TextView) findViewById(R.id.scoreclone);
+				mTextField.setText("Score: " + value);
+            	
             	
             }
         });
@@ -152,7 +159,7 @@ public class Geoprox extends Activity {
 	/*
 	 * Initialize and begin the countdown for the actual game
 	 */
-	private void startGame()
+	private void startGame(SocketIOClient mysocket)
 	{
 		popButton = new Button[12];
 		String buttonstring = "";
@@ -171,6 +178,7 @@ public class Geoprox extends Activity {
 			popButton[i] = (Button) findViewById(resID);
 			popButton[i].setBackgroundColor(colorgrey);
 			popButton[i].setTag(R.id.string_key, 0);
+			final SocketIOClient mysockettemp = mysocket;
 			popButton[i].setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View buttonview) {
@@ -183,6 +191,9 @@ public class Geoprox extends Activity {
 						score--;
 						TextView mTextField = (TextView) findViewById(R.id.score);
 						mTextField.setText("Score: " + score);
+						
+						JSONArray JSONargs = createJSONArray("score",Integer.toString(score));
+				        mysockettemp.emit("scoreclient",JSONargs);
 					}
 					else
 					{
@@ -193,7 +204,9 @@ public class Geoprox extends Activity {
 						score++;
 						TextView mTextField = (TextView) findViewById(R.id.score);
 						mTextField.setText("Score: " + score);
-						Log.v("HI",Integer.toString(score));
+						
+						JSONArray JSONargs = createJSONArray("score",Integer.toString(score));
+				        mysockettemp.emit("scoreclient",JSONargs);
 					}
 				}
 			});
@@ -246,7 +259,8 @@ public class Geoprox extends Activity {
 	    if (resultCode == RESULT_OK) {
 	        // Make sure the request was successful
 	    	Log.v("HI","RESTARTGMAE");
-	        startGame();
+	    	//TODO: need to make this not null later
+	        startGame(null);
 	    }
 	    else
 	    {
