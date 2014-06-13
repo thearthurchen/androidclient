@@ -83,40 +83,16 @@ public class Geoprox extends Activity {
         return newSocket;
 	}
 	
-	private void onSocket(SocketIOClient newSocket){
-		newSocket.on("scoreserver", new EventCallback() {
-            @Override
-            public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
-            	JSONObject socketmsg = null;
-            	String key = null;
-            	String value = null;
-            	try {
-					 socketmsg = arguments.getJSONObject(0);
-					 Iterator<String> iter = socketmsg.keys();
-					    while(iter.hasNext()){
-					        key = (String)iter.next();
-					        value = socketmsg.getString(key);
-					    }
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            	TextView mTextField = (TextView) findViewById(R.id.scoreclone);
-				mTextField.setText("Score: " + value);
-            	
-            	
-            }
-        });
-	}
+	
 	
 	/*
 	 * Socket call back function, identical to example given
 	 * moved emit and on outside of class
 	 */
 	class socketCallback implements ConnectCallback{
-		@Override
-	    public void onConnectCompleted(Exception ex, SocketIOClient client) {
-	    	if (ex != null) {
+	@Override
+	public void onConnectCompleted(Exception ex, SocketIOClient client) {
+		if (ex != null) {
 	            ex.printStackTrace();
 	            return;
 	        }
@@ -134,6 +110,29 @@ public class Geoprox extends Activity {
 					
 				}
 	        });
+	        
+	        
+		client.on("scoreserver", new EventCallback() {
+        	@Override
+        	public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
+            		JSONObject socketmsg = null;
+            		String key = null;
+            		String value = null;
+            		try {
+					 socketmsg = arguments.getJSONObject(0);
+					 Iterator<String> iter = socketmsg.keys();
+					    while(iter.hasNext()){
+					        key = (String)iter.next();
+					        value = socketmsg.getString(key);
+					    }
+			} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+			}
+            		TextView mTextField = (TextView) findViewById(R.id.scoreclone);
+			mTextField.setText("Score: " + value);
+            	}
+        	});
 	        
 	    }
 	}
