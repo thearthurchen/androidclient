@@ -49,14 +49,20 @@ public class Geoprox extends Activity {
 	int colorgrey;
 	int score;
 	Button [] popButton;
+	private SocketIOClient mysocket = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_geoprox);
-		SocketIOClient mysocket = null;
 		mysocket = socketConnect();
 		startGame(mysocket);
+	}
+	
+	@Override 
+	protected void onStart() {
+		super.onStart();
+		Log.i("hi", " im in start");
 	}
 	
 	/*
@@ -65,7 +71,7 @@ public class Geoprox extends Activity {
 	 */
 	private SocketIOClient socketConnect(){
 		socketCallback mysocket = new socketCallback();
-		Future<SocketIOClient> futureSocket = SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://geo-prox.herokuapp.com",  mysocket);
+		final Future<SocketIOClient> futureSocket = SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://geo-prox.herokuapp.com",  mysocket);
 		SocketIOClient newSocket = null;
 		try {
 			 newSocket = futureSocket.get();
@@ -79,34 +85,7 @@ public class Geoprox extends Activity {
 		//JSONArray JSONargs = createJSONArray("hello","world");
         //newSocket.emit("echo",JSONargs);
         Log.v("HI","second");
-        onSocket(newSocket);
         return newSocket;
-	}
-	
-	private void onSocket(SocketIOClient newSocket){
-		newSocket.on("scoreserver", new EventCallback() {
-            @Override
-            public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
-            	JSONObject socketmsg = null;
-            	String key = null;
-            	String value = null;
-            	try {
-					 socketmsg = arguments.getJSONObject(0);
-					 Iterator<String> iter = socketmsg.keys();
-					    while(iter.hasNext()){
-					        key = (String)iter.next();
-					        value = socketmsg.getString(key);
-					    }
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            	TextView mTextField = (TextView) findViewById(R.id.scoreclone);
-				mTextField.setText("Score: " + value);
-            	
-            	
-            }
-        });
 	}
 	
 	/*
@@ -133,6 +112,30 @@ public class Geoprox extends Activity {
 					// TODO Auto-generated method stub
 					
 				}
+	        });
+
+	        client.on("scoreserver", new EventCallback() {
+	            @Override
+	            public void onEvent(JSONArray arguments, Acknowledge acknowledge) {
+	            	JSONObject socketmsg = null;
+	            	String key = null;
+	            	String value = null;
+	            	try {
+						 socketmsg = arguments.getJSONObject(0);
+						 Iterator<String> iter = socketmsg.keys();
+						    while(iter.hasNext()){
+						        key = (String)iter.next();
+						        value = socketmsg.getString(key);
+						    }
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            	TextView mTextField = (TextView) findViewById(R.id.scoreclone);
+					mTextField.setText("Score: " + value);
+	            	
+	            	
+	            }
 	        });
 	        
 	    }
@@ -167,8 +170,22 @@ public class Geoprox extends Activity {
 		colorblue = Color.argb(255, 50, 200, 255);
 		colorgrey = Color.argb(255, 100, 100, 100);
 		score = 0;
+		int never = 0;
 		TextView mTextField = (TextView) findViewById(R.id.score);
 		mTextField.setText("Score: " + score);
+		final SocketIOClient mysockettemp = mysocket;
+		
+		for (int i=0; i < 8; i++) {
+			JSONArray JSONargs = createJSONArray("score",Integer.toString(i));
+	        mysockettemp.emit("scoreclient",JSONargs);
+		}
+		//while (never ==0) {
+		for (int i=0; i < 8; i++) {
+			JSONArray JSONargs = createJSONArray("score",Integer.toString(i+1));
+	        mysockettemp.emit("scoreclient",JSONargs);
+		}
+		//}
+		
 		
 		for (int i=0; i<12; i++)
 		{
@@ -178,7 +195,6 @@ public class Geoprox extends Activity {
 			popButton[i] = (Button) findViewById(resID);
 			popButton[i].setBackgroundColor(colorgrey);
 			popButton[i].setTag(R.id.string_key, 0);
-			final SocketIOClient mysockettemp = mysocket;
 			popButton[i].setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View buttonview) {
@@ -193,7 +209,7 @@ public class Geoprox extends Activity {
 						mTextField.setText("Score: " + score);
 						
 						JSONArray JSONargs = createJSONArray("score",Integer.toString(score));
-				        mysockettemp.emit("scoreclient",JSONargs);
+				        //mysockettemp.emit("scoreclient",JSONargs);
 					}
 					else
 					{
@@ -206,7 +222,7 @@ public class Geoprox extends Activity {
 						mTextField.setText("Score: " + score);
 						
 						JSONArray JSONargs = createJSONArray("score",Integer.toString(score));
-				        mysockettemp.emit("scoreclient",JSONargs);
+				        //mysockettemp.emit("scoreclient",JSONargs);
 					}
 				}
 			});
